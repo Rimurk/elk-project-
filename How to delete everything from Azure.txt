@@ -1,0 +1,4 @@
+How to delete everything from Azure
+
+#Connect-AzAccount
+Get-AzResource | % { Remove-AzResource -ResourceId $_.resourceid -AsJob -Force }

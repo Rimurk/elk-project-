@@ -1,0 +1,6 @@
+#ansible install 
+
+sudo docker pull cyberxsecurity/ansible
+
+#Run
+sudo docker run -ti cyberxsecurity/ansible bash

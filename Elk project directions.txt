@@ -1,0 +1,101 @@
+### Elk Project ###
+
+# Run create-az-environment.ps1 in terminal 
+
+# follow or click https://miicrosoft.com/devicelogin and enter teh code _____to authenticate 
+
+# Confirm Yes and wait for it to build VM's it might take 15 mins should have 19  records on Portal.Azure.com under all resources 
+
+# Create Elk Virtual Network 
+	-Basics: Refer to screen shot  
+	-IP: Addresses Refer to screen shot 
+	-Seurity: leave Default 
+	-Tag: leave defailt
+# Add Peering
+	-click elk-virtural-network
+	-scroll down to peering		
+	-refer to preeing screen shot ( 1 and 2) 
+
+# Creat ELk VM - have to set up (VN) before a (VM)look at screen shoots in elk project file 
+	-Basics: refer to screen shots 
+	-Disk: leave default 
+	-Networking: refer to screen shot 
+	-Management: Turn on Auto Shut down and set time to 11:00:00 PM (UTC-06:00) Central Time (US & Canda)
+	-Advanced: leave default
+	-Tag: leave default
+	- Create: Click 
+
+# ssh into Jump-Box-Provisioner
+	- ssh AzureAdmin@[jump box public IP address for jump]
+
+# install Docker
+
+	-sudo apt-get install docker.io python3-docker -y
+        -sudo docker pull cyberxsecurity/ansible
+	- the next command will make sure everything is saved moving forward 
+	-sudo docker container run --rm -it --mount type=bind,source="/home/AzureAdmin/",target=/etc/ansible/ --mount type=bind,source="/home/AzureAdmin/.ssh/",target=/root/.ssh/ cyberxsecurity/ansible bash
+
+#install Ansible Container (Docker Container)
+# Jumpbox -> Ansible
+	
+	-sudo systemctl start docker
+	-sudo systemctl attach docker
+
+# SSH Access set up for Ansible and elk
+	
+	- from ansible on root ssh-keygen (overwrite: yes / enter passphrase: leave empty click enter twice)	
+	- cd ~
+	- ls -la
+	- cd .ssh/
+   	 
+	- cat id_rsa.pub
+	- copy (ssh-rsa - to end *make sure you do not copy blank space) 
+	- On Protal.azure GUI  click elk-vm scroll down to reset
+password
+	- click reset ssh public key 
+	- Username: AzureAdmin
+	-SSH public key: paste [cat id_rsa.pub]
+	
+#SSH from Ansible Container (Docker Container)-> Elk (VM)
+
+	- ssh AzureAdmin@10.1.0.4
+	-sudo apt-get update	
+	- sudo apt-get install docker.io
+	- /etc/ansible nano hosts
+	- add under websevers 
+ [webservers]
+ 10.0.0.4 ansible_python_interpreter=/usr/bin/python3
+ 10.0.0.5 ansible_python_interpreter=/usr/bin/python3
+10.0.0.6 ansible_python_interpreter=/usr/bin/python3
+
+ [elk]
+ 10.1.0.4 ansible_python_interpreter=/usr/bin/python3
+
+#install Elk container from ansivle container
+
+	-mkdir files
+	- cd files/
+	- nano install-elk.yml
+	- paste in install yml file from elk project folder 
+	- ssh from ansible container --> elk  
+	- ssh AzureAdmin@10.1.0.4
+	- ps docker -a ( will show you the name of elk conainer)
+#  Elk-ngs  (Network-Security Group) on portal.Azure.com
+	
+	- All Resources -> Elk-ngs- inbound security rules
+	- click add 
+	-  destination prot ranger 5601
+	- name: port5601-kibana 
+
+# Conntect to Kibana 
+
+	-[Elk public IP]:5601
+	- on kibana GUI Home/add data/ system logs
+	- Deb 
+	- 
+	
+
+
+	
+
+	
